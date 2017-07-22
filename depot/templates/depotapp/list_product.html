@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='UTF-8'>
+	<title>Create Item</title>
+</head>
+<body>
+	<form action='' method="get">
+	{% csrf_token %}
+	{%for item in items%}
+		<div class="fieldWrapper">
+		{{item.id}}     {{item.name}}       {{item.price}}
+		{{item.errors}}
+		<a href="	http://127.0.0.1:8000/depotapp/product/create"> edit </a>
+		</br>
+		</div>
+	{%endfor%}
+		
+	
+	<div class="pagination">
+	<nav>
+	<ul class="pagination">
+		{% if items.has_previous %}
+			<li class="">
+			<a href="?page={{items.previous_page_number}}" aria-label="Previous"> 
+			<span>&laquo </span>
+			</a>
+			</li>
+		{% endif %}
+		{%for pg in items.paginator.page_range%}
+			{% ifequal items.number pg %}
+				<li class="active"><a href="?page={{pg}}">{{pg}}</a></li>
+			{% else %}
+				<li><a href="?page={{pg}}">{{pg}}</a></li>
+			{% endifequal %}
+		{% endfor %}
+		{% if items.has_next %}
+			<li class="">
+			<a href="?page={{items.next_page_number}}" aria-label="Next"> 
+			<span> &raquo </span>
+			</a>
+			</li>
+		{% endif %}
+		<span> {{items.number}}/{{items.paginator.num_pages}}</span>
+	</ul>
+	</nav>
+	</div>
+	<!--
+	<div class="pagination">
+		<span class="current">
+		{% if items.has_previous %}
+			<span><a href="?page={{items.previous_page_number}}">previous</a></span>
+		{% endif %}
+		{% for pg in items.paginator.page_range %}
+			{% ifequal items.number pg %}
+				<li class="active"><a href="?page={{pg}}">{{pg}}</a></li>
+			{% else %}
+				<li><a href="?page={{pg}}">{{pg}}</a></li>
+			{% endifequal %}
+		{% endfor %}
+		{% if items.has_next %}
+			<span><a href="?page={{items.next_page_number}}">next</a></span>
+		{% endif %}
+		</span>
+	</div>
+	-->
+	</form>
+</body>
+
+</html>
