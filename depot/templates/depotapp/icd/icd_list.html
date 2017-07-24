@@ -1,0 +1,64 @@
+{% extends "ate_tasks/icd/icd_base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "ICD" "ate_tasks:icd-info-index" %}
+{% endblock %}
+{% block icd_work_space %}
+    <div class="row">
+        {% block display_content %}
+            <table class="table table-striped table-bordered">
+                {% block base_table_content %}
+                    <thead>
+                    <tr>
+                        <th style="text-align: center;">名称</th>
+                        <th style="text-align: center;">创建日期</th>
+                        <th style="text-align: center;">修改日期</th>
+                        <th style="text-align: center;">创建者</th>
+                        <th style="text-align: center;">备注</th>
+                        <th style="text-align: center;">操作</th>
+                    </thead>
+                    <tbody>
+                    {% for current_obj in page_obj.object_list %}
+                        <tr>
+                            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.name }}</td>
+                            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.created }}</td>
+                            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.modified }}</td>
+                            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.creator }}</td>
+                            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.description }}</td>
+                            <td style='vertical-align: middle;text-align: center;'>
+
+                                <a href="{% url "ate_tasks:icd-messages" current_obj.id %}"
+                                   class="btn btn-default"
+                                   role="button">进入 <span class="glyphicon glyphicon-edit"></span>
+                                </a>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                {% endblock %}
+            </table>
+        {% endblock %}
+    </div>
+    <div class="row">
+        {% if is_paginated %}
+            <ul class="pagination pull-right">
+                {% if page_obj.has_previous %}
+                    <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                {% else %}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {% endif %}
+                <li class="disabled"><a href="#">页 {{ page_obj.number }}
+                    共 {{ paginator.num_pages }}页</a></li>
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+{% endblock %}

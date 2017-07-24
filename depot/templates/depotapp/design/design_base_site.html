@@ -1,0 +1,25 @@
+{% extends "ate_tasks/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block head_img %}
+    {% static 'ate_tasks/img/module_design.jpg' %}
+{% endblock %}
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {% breadcrumb "自动测试平台" "ate_tasks:index" %}
+{% endblock %}
+{% block work_space %}
+    <div id="wrap-work-space" class="">
+        <div class="container">
+            <div class="row">
+                {% render_breadcrumbs %}
+                <div class="col-md-12">
+                    {% block design_work_space %}
+
+                    {% endblock design_work_space %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

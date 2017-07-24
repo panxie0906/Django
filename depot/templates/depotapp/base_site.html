@@ -1,0 +1,125 @@
+{% extends "ate_tasks/base.html" %}
+{% load static %}
+
+{% block title %}{{ title|default:"智能测试平台" }}{% endblock %}
+{% block main_style %}
+    <link href="{% static 'ate_tasks/css/bootstrap-readable.min.css' %}" rel="stylesheet">
+
+{% endblock %}
+{% block main_head %}
+    <script src="{% static 'ate_tasks/js/jquery-3.1.1.min.js' %}"></script>
+    <script>
+        try {
+            $ = jQuery = module.exports;
+            // If you want module.exports to be empty, uncomment:
+            // module.exports = {};
+        } catch (e) {
+        }
+    </script>
+    <script src="{% static 'ate_tasks/js/bootstrap.min.js' %}"></script>
+
+{% endblock %}
+
+{% block navigator %}
+    <!-- Wrap all page content here -->
+    <div id="wrap-navigator" class="">
+        <!-- Fixed navbar -->
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    {#                    <a href="{% url 'ate_tasks:index' %}" class="navbar-left"><img#}
+                    {#                            src="{% static 'ate_tasks/img/logo.png' %}"></a>#}
+                    <a class="navbar-brand" href="{% url 'ate_tasks:index' %}">智能测试平台</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">测试开发 <b
+                                    class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header">配置管理</li>
+                                <li><a href="{% url 'ate_tasks:design-validation-phase-index' %}">验证阶段</a></li>
+                                <li><a href="{% url 'ate_tasks:design-project-index' %}">项目</a></li>
+                                <li><a href="{% url 'ate_tasks:design-product-index' %}">产品</a></li>
+                                <li><a href="{% url 'ate_tasks:design-product-instance-index' %}">产品实例</a></li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">流程管理</li>
+                                <li><a href="{% url 'ate_tasks:design-keyword-index' %}">关键字</a></li>
+                                <li><a href="{% url 'ate_tasks:design-test-item-index' %}">测试项</a></li>
+                                <li><a href="{% url 'ate_tasks:design-task-index' %}">测试任务</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">测试执行 <b
+                                    class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                {#                                <li><a href="#">产品列表</a></li>#}
+                                <li><a href="{% url 'ate_tasks:execute-task-instance-index' %}">任务实例列表</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">激励与监控 <b
+                                    class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url "ate_tasks:icd-info-index" %}">静态激励</a></li>
+                                <li><a href="#">数据监控</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">数据中心 <b
+                                    class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                {#                                <li><a href="#">测试结果</a></li>#}
+                                <li><a target="_blank" href="/tasks/api/">数据接口</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user }} <b
+                                    class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url "admin:index" %}" target="_blank">用户后台</a></li>
+                                <li><a href="{% url "ate_tasks:logout" %}">注销</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </div>
+    </div>
+    <div class="row"><br><br><br></div>
+{% endblock navigator %}
+{% block content %}
+    {% block display_image %}
+        <div id="wrap-display-image" class="">
+            <div class="container">
+                <div class="row">
+                    <div><img src="{% block head_img %}{% static 'ate_tasks/img/index_img.jpg' %}{% endblock %}"
+                              width="100%"></div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+    {% block work_space %}{% endblock %}
+
+{% endblock %}
+{% block after_main_container %}
+    {% block footer %}
+        <div id="wrap-footer" class="">
+            <div id="footer" class="">
+                <div class="container">
+                    <p style="text-align: left;" class="text-muted credit">版权所有：<a target="_blank" href="http://www.careri.avic.com/"
+                                                         class="">中国航空无线电电子研究所</a>.</p>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock after_main_container %}
+{% block not_authenticated %}
+    <h1>请登录系统</h1>
+    <p>用户验证失败，请<a href="{% url 'ate_tasks:login' %}">登录</a></p>
+{% endblock %}

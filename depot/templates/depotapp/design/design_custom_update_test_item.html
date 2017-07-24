@@ -1,0 +1,27 @@
+{% extends "ate_tasks/design/design_base_update.html" %}
+{% load static %}
+{% block extra_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/codemirror.css' %}" rel="stylesheet">
+{% endblock %}
+{% block extra_head %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/codemirror.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/python.js' %}"></script>
+
+{% endblock %}
+{% block extra_script %}
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+            mode: {
+                name: "python",
+                version: 3,
+                singleLineStringErrors: false
+            },
+            lineNumbers: true,
+            indentUnit: 4,
+            matchBrackets: true
+        });
+
+    </script>
+{% endblock %}

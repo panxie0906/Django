@@ -1,0 +1,44 @@
+{% extends "ate_tasks/design/design_base_list.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "验证阶段" "ate_tasks:design-validation-phase-index" %}
+{% endblock %}
+{% block base_table_content %}
+    <thead>
+    <tr>
+        <th style="text-align: center;">名称</th>
+        <th style="text-align: center;">创建日期</th>
+        <th style="text-align: center;">修改日期</th>
+        <th style="text-align: center;">创建者</th>
+        <th style="text-align: center;"><a
+                href="{% url "ate_tasks:design-validation-phase-create" %}" class="btn btn-success"
+                role="button">新建 <span class="glyphicon glyphicon-plus"></span></a></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for current_obj in page_obj.object_list %}
+        <tr>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.name }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.created }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.modified }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.creator }}</td>
+            <td style='vertical-align: middle;text-align: center;'>
+                <a
+                        href="{% url "ate_tasks:design-validation-phase-update" current_obj.id %}"
+                        class="btn btn-default"
+                        role="button">编辑 <span class="glyphicon glyphicon-edit"></span>
+                </a>
+                <a
+                        href="{% url "ate_tasks:design-validation-phase-delete" current_obj.id %}"
+                        class="btn btn-danger"
+                        role="button">删除 <span class="glyphicon glyphicon-remove"></span>
+                </a>
+            </td>
+
+        </tr>
+    {% endfor %}
+
+    </tbody>
+{% endblock %}

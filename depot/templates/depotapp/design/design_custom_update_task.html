@@ -1,0 +1,36 @@
+{% extends "ate_tasks/design/design_base_update.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block create_fieldset %}
+    <fieldset>
+        <legend>测试项列表</legend>
+        <table class="table table-bordered">
+            {{ task_step_form.management_form }}
+
+            {% for link_form in task_step_form %}
+                <div class="link-formset">
+                    {{ link_form.order }}
+                    {% if link_form.anchor.errors %}
+                        {% for error in link_form.anchor.errors %}
+                            {{ error|escape }}
+                        {% endfor %}
+                    {% endif %}
+
+                    {{ link_form.test_item }}
+                    {% if link_form.url.errors %}
+                        {% for error in link_form.url.errors %}
+                            {{ error|escape }}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% if task_step_form.non_form_errors %}
+                {% for error in task_step_form.non_form_errors %}
+                    {{ error|escape }}
+                {% endfor %}
+            {% endif %}
+            {#            {{ task_step_form }}#}
+        </table>
+    </fieldset>
+{% endblock %}

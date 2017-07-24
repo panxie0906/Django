@@ -1,0 +1,84 @@
+{% extends "ate_tasks/icd/icd_list.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "消息列表" "ate_tasks:icd-info-index" %}
+{% endblock %}
+{% block extra_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/bootstrap-treeview.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block extra_head %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/bootstrap-treeview.min.js' %}"></script>
+{% endblock %}
+{% load static %}
+{% block icd_work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="tree"></div>
+            </div>
+            <div class="col-md-9">
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_script %}
+    <div id="tree_view_data" hidden="hidden">
+        {{ tree_view_data }}
+    </div>
+    <script>
+        function getTree() {
+            var tree_string = $("#tree_view_data").text();
+            return $.parseJSON(tree_string);
+            {#            return [{#}
+            {#                text: "子系统1",#}
+            {#                selectable: false,#}
+            {#                tags: ['available'],#}
+            {#                state: {#}
+            {#                    expanded: true#}
+            {#                },#}
+            {#                nodes: [{#}
+            {#                    text: "子项目1",#}
+            {#                    state: {#}
+            {#                        expanded: true#}
+            {#                    },#}
+            {#                    nodes: [{#}
+            {#                        text: "1553总线"#}
+            {#                    },#}
+            {#                        {#}
+            {#                            text: "429总线",#}
+            {#                            state: {#}
+            {#                                expanded: true#}
+            {#                            },#}
+            {#                            tags: ['3'],#}
+            {#                            nodes: [{#}
+            {#                                text: "消息1"#}
+            {##}
+            {#                            },#}
+            {#                                {#}
+            {#                                    text: "消息2"#}
+            {#                                },#}
+            {#                                {#}
+            {#                                    text: "消息3"#}
+            {#                                }]#}
+            {#                        }#}
+            {#                    ]#}
+            {#                },#}
+            {#                    {#}
+            {#                        text: "子项目2"#}
+            {#                    }#}
+            {#                ]#}
+            {#            }#}
+            {#            ];#}
+        }
+
+        $('#tree').treeview({
+            data: getTree(),
+            showTags: true,
+            enableLinks: true
+        });
+    </script>
+{% endblock %}

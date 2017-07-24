@@ -1,0 +1,30 @@
+{% extends "ate_tasks/base_site.html" %}
+{% load static %}
+{% block work_space %}
+    <div id="wrap-work-space" class="">
+        <div class="container">
+            <div class="row">
+
+                <div class="page-header">
+                    <h1 class="" contenteditable="false">快速导航</h1>
+                </div>
+                <ul>
+                    <li><p class="lead">测试开发：<a href="{% url 'ate_tasks:design-validation-phase-index' %}">验证阶段管理</a>，
+                        <a href="{% url 'ate_tasks:design-project-index' %}">项目管理</a>，
+                        <a href="{% url 'ate_tasks:design-product-index' %}">产品管理</a>，
+                        <a href="{% url 'ate_tasks:design-product-instance-index' %}">产品实例管理</a>，
+                        <a href="{% url 'ate_tasks:design-keyword-index' %}">关键字管理</a>，
+                        <a href="{% url 'ate_tasks:design-test-item-index' %}">测试项管理</a>，
+                        <a href="{% url 'ate_tasks:design-task-index' %}">测试任务管理</a></p></li>
+                    <li><p class="lead">测试执行：<a href="{% url 'ate_tasks:execute-task-instance-index' %}">任务实例列表</a></p>
+                    </li>
+                    <li><p class="lead">激励与监控：<a href="{% url "ate_tasks:icd-info-index" %}">静态激励</a></p></li>
+                    <li><p class="lead">数据中心：<a target="_blank" href="/tasks/api/">数据接口</a></p></li>
+                    <li><p class="lead">个人中心：<a href="{% url "admin:index" %}" target="_blank">用户后台</a></p></li>
+                </ul>
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}

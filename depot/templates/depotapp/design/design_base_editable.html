@@ -1,0 +1,21 @@
+{% extends "ate_tasks/design/design_base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+{% endblock %}
+{% block design_work_space %}
+    <div class="page-header">
+        <h2 class="" contenteditable="false">{{ title }}</h2>
+    </div>
+    <form action="" method="post" {% if file_upload %}enctype="multipart/form-data"{% endif %}>{% csrf_token %}
+        {% block model_form %}
+            <table class="table table-bordered">
+                {{ form.as_table }}
+            </table>
+        {% endblock %}
+        {% block create_fieldset %}{% endblock %}
+        {% block submit_button %}{% endblock %}
+        <a href="{{ success_url }}" class="btn btn-default" role="button">返回</a>
+    </form>
+{% endblock %}

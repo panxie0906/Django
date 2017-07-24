@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load django_bootstrap_breadcrumbs %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    {% block main_style %}{% endblock %}
+    {% block extra_style %}{% endblock %}
+    {% block main_head %}{% endblock %}
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+    {% block authenticated %}
+        {% block breadcrumbs %}
+            {% clear_breadcrumbs %}
+        {% endblock %}
+        {% block navigator %}{% endblock %}
+        {% block content %}{% endblock %}
+        {% block after_main_container %}{% endblock after_main_container %}
+        {% block extra_script %}{% endblock %}
+    {% endblock %}
+{% else %}
+    {% block not_authenticated %}{% endblock %}
+{% endif %}
+
+</body>
+
+</html>
