@@ -1,0 +1,12 @@
+{% extends "ate_tasks/entity/base_create.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb verbose_name "ate_tasks:entity-task-list" %}
+    {% breadcrumb "新建" "ate_tasks:entity-task-create" %}
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/jquery.formset.js' %}"></script>
+{% endblock %}

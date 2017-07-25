@@ -1,0 +1,370 @@
+{% extends "ate_tasks/execute/runner_list.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb task_instance_uuid "ate_tasks:execute-runner" taskinstance.id %}
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/reconnecting-websocket.min.js' %}"></script>
+    <script>
+        try {
+            ReconnectingWebSocket = module.exports;
+        } catch (e) {
+        }
+    </script>
+    <script src="{% static 'ate_tasks/js/raphael.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/flowchart-latest.js' %}"></script>
+{% endblock %}
+{% block extra_script %}
+    {{ block.super }}
+    <script>
+        if (typeof RunnerStatus === "undefined") {
+            var RunnerStatus = {
+                DEFAULT: 1,
+                RUNNING: 2,
+                SUCCESS: 3,
+                ERROR: 4,
+                OPENED: 5,
+                CLOSED: 6,
+                STOPPING: 7,
+                STOPPED: 8
+            }
+        }
+        String.format = function () {
+            if (arguments.length === 0)
+                return null;
+            var str = arguments[0];
+            for (var i = 1; i < arguments.length; i++) {
+                var re = new RegExp('\\{' + (i - 1) + '\\}', 'gm');
+                str = str.replace(re, arguments[i]);
+            }
+            return str;
+        };
+        Date.prototype.pattern = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours() % 12 === 0 ? 12 : this.getHours() % 12, //小时
+                "H+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds(), //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds() //毫秒
+            };
+            var week = {
+                "0": "/u65e5",
+                "1": "/u4e00",
+                "2": "/u4e8c",
+                "3": "/u4e09",
+                "4": "/u56db",
+                "5": "/u4e94",
+                "6": "/u516d"
+            };
+            if (/(y+)/.test(fmt)) {
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            if (/(E+)/.test(fmt)) {
+                fmt = fmt.replace(RegExp.$1, ((RegExp.$1.length > 1) ? (RegExp.$1.length > 2 ? "/u661f/u671f" : "/u5468") : "") + week[this.getDay() + ""]);
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(fmt)) {
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                }
+            }
+            return fmt;
+        };
+
+        var $real_time_message_box = $('#real_time_message');
+        var $reconnect_text_box = $('#reconnect_text');
+        var $btn_execute = $('#btn_execute');
+        var $btn_refresh = $('#btn_refresh');
+        var $btn_export = $('#btn_export');
+        var $btn_stop = $('#btn_stop');
+        function changeStatus(status) {
+            if (status === RunnerStatus.DEFAULT) {
+                $btn_execute.attr("disabled", "disabled");
+                $btn_refresh.attr("disabled", "disabled");
+                $btn_export.attr("disabled", "disabled");
+                $btn_stop.attr("disabled", "disabled");
+            }
+            else if (status === RunnerStatus.RUNNING) {
+                $btn_execute.attr("disabled", "disabled");
+                $btn_refresh.attr("disabled", "disabled");
+                $btn_export.attr("disabled", "disabled");
+                $btn_stop.removeAttr("disabled");
+            }
+            else if (status === RunnerStatus.SUCCESS) {
+                $btn_execute.attr("disabled", "disabled");
+                $btn_refresh.removeAttr("disabled");
+                $btn_export.removeAttr("disabled");
+                $btn_stop.attr("disabled", "disabled");
+            }
+            else if (status === RunnerStatus.ERROR) {
+                $btn_execute.removeAttr("disabled");
+                $btn_refresh.removeAttr("disabled");
+                $btn_export.attr("disabled", "disabled");
+                $btn_stop.attr("disabled", "disabled");
+            }
+            else if (status === RunnerStatus.OPENED) {
+                $btn_execute.removeAttr("disabled");
+                $btn_refresh.removeAttr("disabled");
+                $btn_export.attr("disabled", "disabled");
+                $btn_stop.attr("disabled", "disabled");
+                $reconnect_text_box.attr("hidden", "hidden");
+            }
+            else if (status === RunnerStatus.CLOSED) {
+                $btn_execute.attr("disabled", "disabled");
+                $btn_refresh.attr("disabled", "disabled");
+                $btn_export.attr("disabled", "disabled");
+                $btn_stop.attr("disabled", "disabled");
+                $reconnect_text_box.removeAttr("hidden");
+            }
+            else if (status === RunnerStatus.STOPPING) {
+                $btn_execute.attr("disabled", "disabled");
+                $btn_refresh.attr("disabled", "disabled");
+                $btn_export.attr("disabled", "disabled");
+                $btn_stop.attr("disabled", "disabled");
+            }
+            else if (status === RunnerStatus.STOPPED) {
+                $btn_execute.attr("disabled", "disabled");
+                $btn_refresh.removeAttr("disabled");
+                $btn_export.attr("disabled", "disabled");
+                $btn_stop.attr("disabled", "disabled");
+            }
+        }
+        changeStatus(RunnerStatus.DEFAULT);
+        var flow_chart_string = $("#flow_editor").text();
+        var diagram = flowchart.parse(flow_chart_string);// the other symbols too...
+        diagram.drawSVG('diagram');
+        socket = new ReconnectingWebSocket("ws://" + window.location.host + "/task/{{ taskinstance.uuid }}/");
+        socket.onclose = function () {
+            changeStatus(RunnerStatus.CLOSED);
+        };
+        socket.onopen = function () {
+            changeStatus(RunnerStatus.OPENED);
+        };
+        socket.onmessage = function (e) {
+            try {
+                var obj = $.parseJSON(e.data);
+                if (obj.message_type === "state") {
+                    var record_state = $(String.format("#{0}-state", obj.name));
+                    if (obj.state === 'SUCCESS') {
+                        socket.send(JSON.stringify({
+                            "message_type": "result", "uuid": "{{ taskinstance.uuid }}",
+                            "name": obj.name
+                        }));
+                        record_state.text('Done');
+                    }
+                    else {
+                        record_state.text(obj.state);
+                    }
+                    if (obj.state === 'RUNNING') {
+                        var record_running = $(String.format("#{0}", obj.name));
+                        record_running.removeClass('active').addClass('warning');
+
+                    }
+                } else if (obj.message_type === "result") {
+                    var record_result = $(String.format("#{0}-result", obj.name));
+                    var record_active = $(String.format("#{0}", obj.name));
+                    if (obj.pass === true) {
+                        record_active.removeClass('warning').addClass('success');
+                        record_result.text('通过');
+                    }
+                    else {
+                        record_active.removeClass('warning').addClass('danger');
+                        record_result.text('未通过');
+                    }
+
+                }
+                else if (obj.message_type === "flow_state") {
+                    if (obj.state === 'SUCCESS') {
+                        changeStatus(RunnerStatus.SUCCESS);
+                    }
+                } else if (obj.message_type === "message") {
+                    var date = new Date();
+                    $real_time_message_box.append(date.pattern("yyyy-MM-dd hh:mm:ss") + "    " + obj.message + '\n');
+                }
+                else if (obj.message_type === "window") {
+                    $.confirm({
+                        title: obj.window_detail.title,
+                        content: obj.window_detail.content,
+                        type: 'green',
+                        autoClose: '取消|' + ((obj.timeout - 1) * 1000).toString(),
+                        buttons: {
+                            "确认": function () {
+                                var window_response = {
+                                    message_type: "window",
+                                    window_id: obj.window_id,
+                                    window_result: true
+                                };
+                                socket.send(JSON.stringify(window_response));
+                            },
+                            "取消": function () {
+                                var window_response = {
+                                    message_type: 'window',
+                                    window_id: obj.window_id,
+                                    window_result: false
+                                };
+                                socket.send(JSON.stringify(window_response));
+                            }
+                        }
+                    });
+                }
+            }
+            catch (error) {//如果发生异常会执行的代码，error为发生的异常类对象
+                alert(error);
+                alert(e.data);
+            }
+            finally {//无条件执行的代码
+            }
+        };
+        $btn_execute.click(function () {
+            changeStatus(RunnerStatus.RUNNING);
+            $.get("{% url "ate_tasks:run_task_instance" taskinstance.id %}", function (data, status) {
+                if (status === 'success') {
+                    if (data.result) {
+                        changeStatus(RunnerStatus.RUNNING);
+                    }
+                    else {
+                        alert(String.format('执行任务失败，原因为{0}。', data.detail));
+                        changeStatus(RunnerStatus.ERROR);
+                    }
+
+                } else {
+                    changeStatus(RunnerStatus.ERROR);
+                }
+
+            });
+        });
+        $btn_stop.click(function () {
+            changeStatus(RunnerStatus.STOPPING);
+            $.get("{% url "ate_tasks:suspend-task-instance" taskinstance.id %}", function (data, status) {
+                if (status === 'success') {
+                    if (data.result) {
+                        $.confirm({
+                            title: "停止任务成功",
+                            content: "任务停止，重置界面后才能重新运行",
+                            type: 'green',
+                            buttons: {
+                                "确认": function () {
+                                }
+                            }
+                        });
+                        changeStatus(RunnerStatus.STOPPED);
+                    }
+                    else {
+                        $.confirm({
+                            title: "停止任务失败",
+                            content: data.detail,
+                            type: 'red',
+                            buttons: {
+                                "确认": function () {
+                                }
+                            }
+                        });
+                        changeStatus(RunnerStatus.ERROR);
+                    }
+
+                } else {
+                    $.confirm({
+                        title: "停止任务失败",
+                        content: data.detail,
+                        type: 'red',
+                        buttons: {
+                            "确认": function () {
+                            }
+                        }
+                    });
+                    changeStatus(RunnerStatus.ERROR);
+                }
+
+            });
+        });
+    </script>
+{% endblock %}
+{% block work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="editor" id="flow_editor" hidden="hidden">
+                    {{ flow_chart_string }}
+                </div>
+            </div>
+            <div class="col-md-12">
+                {% render_breadcrumbs %}
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>所属任务</h3>
+                                    <p>{{ taskinstance.task.name }}</p>
+                                    <h3>任务描述</h3>
+                                    <p>{{ taskinstance.task.description }}</p>
+                                    <br>
+                                    <div class="btn-group btn-group-md">
+                                        <button class="btn btn-success" type="button" id="btn_execute">
+                                            <em class="glyphicon glyphicon-play"></em> 执行
+                                        </button>
+                                        <button class="btn btn-danger" type="button" id="btn_stop">
+                                            <em class="glyphicon glyphicon-stop"></em> 停止
+                                        </button>
+                                        <button class="btn btn-danger" type="button" id="btn_refresh"
+                                                onclick="location.href = '.'">
+                                            <em class="glyphicon glyphicon-stop"></em> 重置界面
+                                        </button>
+                                        <button class="btn btn-info" type="button" id="btn_export"
+                                                onclick="location.href = '{% url 'ate_tasks:execute-task-instance-result' taskinstance.id %}'">
+                                            <em class="glyphicon glyphicon-export"></em> 导出结果
+                                        </button>
+                                    </div>
+                                    <div id="reconnect_text" class="col-md-12" hidden="hidden">
+                                        <span> 网络通信中断...正在重新连接...</span>
+                                    </div>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>测试项</th>
+                                            <th>合格判据</th>
+                                            <th>测试状态</th>
+                                            <th>结论</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for step in steps %}
+                                            <tr class="active" id="{{ step.name }}">
+                                                <td>{{ step.order }}</td>
+                                                <td>{{ step.real_name }}</td>
+                                                <td>{{ step.expected }}</td>
+                                                <td id="{{ step.name }}-state">PENDING</td>
+                                                <td id="{{ step.name }}-result">WAITING</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <h3>实时信息</h3>
+                                    <textarea rows="10" style="width: 100%" title="message"
+                                              id="real_time_message"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="container-fluid">
+                            <div class="row" style="text-align:center">
+                                <div class="col-md-12">
+                                    <div id="diagram" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock work_space %}

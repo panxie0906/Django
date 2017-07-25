@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_PATH= os.path.join(BASE_DIR,'templates')
 
 
-#print(BASE_DIR)
+print(BASE_DIR)
 #print(TEMPLATES_PATH)
 
 
@@ -45,9 +45,11 @@ INSTALLED_APPS = [
 	
 	#the third party plug-ins
 	'django-groundwork',
+	'django_bootstrap_breadcrumbs',
 	
 	#apps developed myself
-	'depotapp.apps.DepotappConfig'
+	'depotapp.apps.DepotappConfig',
+	'ate_tasks.apps.AteTasksConfig',
 	
 ]
 
@@ -75,6 +77,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries':{
+                'page_tag':'templatetags.page_tag',
+            }
         },
     },
 ]

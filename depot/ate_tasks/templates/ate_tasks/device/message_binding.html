@@ -1,0 +1,97 @@
+{% extends "ate_tasks/device/navigator.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb object.name "ate_tasks:device-message-binding" object.id %}
+{% endblock %}
+{% block main_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/alpaca.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ate_tasks/css/bootstrap-multiselect.css' %}" rel="stylesheet">
+    <link href="{% static 'ate_tasks/css/jquery-confirm.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/handlebars-v4.0.10.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/alpaca.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/bootstrap-multiselect.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/js.cookie.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/jquery-confirm.min.js' %}"></script>
+{% endblock %}
+{% block device_work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="form"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_script %}
+    {{ block.super }}
+    <script>
+        $(function () {
+            $("#icd_tree").fancytree(
+                {
+                    source: JSON.parse($("#simple_icd_tree").text())
+                }
+            );
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#form").alpaca({
+                "view": "bootstrap-edit",
+                "dataSource": "{% url 'ate_tasks:get-device-binding' %}?pk={{ object.id }}",
+                "schemaSource": "{% url 'ate_tasks:get-binding-schema' %}?bus_type={{ object.bus }}",
+                "optionsSource": "{% url 'ate_tasks:get-binding-option' %}?bus_type={{ object.bus }}",
+                "options": {
+                    "form": {
+                        "attributes": {
+                            "action": "",
+                            "method": "post",
+                            "enctype": "multipart/form-data"
+                        },
+                        "buttons": {
+                            "submit": {
+                                "title": "更新",
+                                "click": function () {
+                                    var value = this.getValue();
+                                    var postData = {
+                                        "csrfmiddlewaretoken": Cookies.get('csrftoken'),
+                                        "bindings": JSON.stringify(value, null, "  ")
+                                    };
+                                    $.post("", postData, function (result) {
+                                        var control = $("#form").alpaca("get");
+                                        control.refresh(function () {
+                                            $.alert({
+                                                title: '更新成功',
+                                                content: '内容已更新'
+                                            });
+                                        });
+                                    });
+
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
+
+{% block icd_navigator %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="simple_icd_tree" hidden="hidden">
+                    {{ simple_icd_tree }}
+                </div>
+                <div id="icd_tree"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

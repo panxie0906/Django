@@ -1,0 +1,37 @@
+{% extends "ate_tasks/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block head_img %}
+    <img src="{% static 'ate_tasks/img/module_design.jpg' %}" width="100%"/>
+{% endblock %}
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {% breadcrumb "自动测试平台" "ate_tasks:index" %}
+{% endblock %}
+{% block work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                {% render_breadcrumbs %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                {% block device_navigator %}
+
+                {% endblock %}
+            </div>
+            <div class="col-md-6">
+                {% block device_work_space %}
+
+                {% endblock %}
+            </div>
+            <div class="col-md-3">
+                {% block icd_navigator %}
+
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

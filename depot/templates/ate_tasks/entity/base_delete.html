@@ -1,0 +1,6 @@
+{% extends "ate_tasks/entity/base_editable.html" %}
+
+{% block submit_button %}
+    <p>确定要删除 "{{ object }}"吗?</p>
+    <input type="submit" class="btn btn-danger" value="删除"/>
+{% endblock %}

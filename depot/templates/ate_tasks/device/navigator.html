@@ -1,0 +1,69 @@
+{% extends "ate_tasks/device/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "资源列表" "ate_tasks:device-list" %}
+{% endblock %}
+{% block main_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/skin-win8/ui.fancytree.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/jquery.fancytree-all-deps.min.js' %}"></script>
+{% endblock %}
+{% block device_navigator %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="device_tree" hidden="hidden">
+                    {{ device_tree }}
+                </div>
+                <div id="tree"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_script %}
+    {{ block.super }}
+    <script>
+        $(function () {
+            $("#tree").fancytree(
+                {
+                    click: function (event, data) {
+                        if (data.node.data.href !== undefined) {
+                            window.location.href = data.node.data.href;
+                        }
+                    },
+                    source: JSON.parse($("#device_tree").text())
+                }
+            );
+        });
+    </script>
+{% endblock %}}
+{% block device_work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url "ate_tasks:device-upload" %}"
+                   class="btn btn-success"
+                   role="button">上传文件 <span
+                        class="glyphicon glyphicon-apple"></span>
+                </a>
+                <p>当前共有{{ object_list.count }}个服务节点。</p>
+                {% for object in object_list %}
+                    <h2>服务节点-{{ object.ip }}</h2>
+                    <hr/>
+                    {% for device in object.devices.all %}
+                        <p>资源名：{{ device.name }}</p>
+                        <p>资源ID：{{ device.device_id }}</p>
+                        <p>总线类型：{{ device.bus }}</p>
+                        <p>是否正在运行：{{ device.is_running }}</p>
+                        <hr/>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

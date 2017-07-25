@@ -1,0 +1,237 @@
+{% extends "ate_tasks/monitor/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "数据监控" "ate_tasks:monitor-detail" object.id %}
+{% endblock %}
+{% block main_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/skin-win8/ui.fancytree.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/reconnecting-websocket.min.js' %}"></script>
+    <script>
+        try {
+            ReconnectingWebSocket = module.exports;
+        } catch (e) {
+        }
+    </script>
+    <script src="{% static 'ate_tasks/js/jquery.fancytree-all-deps.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/js.cookie.js' %}"></script>
+{% endblock %}
+
+{% block message_monitor_workspace %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height:500px;overflow-y:scroll;">
+                    <table class="table table-bordered table-fixed" id="message-monitor">
+                        <thead>
+                        <tr>
+                            <th style="text-align: center;">时间戳</th>
+                            <th style="text-align: center;">消息ID</th>
+                            <th style="text-align: center;">消息长度</th>
+                            <th style="text-align: center;">总线类型</th>
+                            <th style="text-align: center;">原始数据</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block variable_monitor_workspace %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>暂未实现变量监控功能</h3>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+    {{ block.super }}
+    <script>
+        if (typeof RunnerStatus === "undefined") {
+            var RunnerStatus = {
+                DEFAULT: 1,
+                RUNNING: 2,
+                SUCCESS: 3,
+                ERROR: 4,
+                OPENED: 5,
+                CLOSED: 6
+            }
+        }
+        String.format = function () {
+            if (arguments.length === 0)
+                return null;
+            var str = arguments[0];
+            for (var i = 1; i < arguments.length; i++) {
+                var re = new RegExp('\\{' + (i - 1) + '\\}', 'gm');
+                str = str.replace(re, arguments[i]);
+            }
+            return str;
+        };
+        Date.prototype.pattern = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours() % 12 === 0 ? 12 : this.getHours() % 12, //小时
+                "H+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds(), //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds() //毫秒
+            };
+            var week = {
+                "0": "/u65e5",
+                "1": "/u4e00",
+                "2": "/u4e8c",
+                "3": "/u4e09",
+                "4": "/u56db",
+                "5": "/u4e94",
+                "6": "/u516d"
+            };
+            if (/(y+)/.test(fmt)) {
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            if (/(E+)/.test(fmt)) {
+                fmt = fmt.replace(RegExp.$1, ((RegExp.$1.length > 1) ? (RegExp.$1.length > 2 ? "/u661f/u671f" : "/u5468") : "") + week[this.getDay() + ""]);
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(fmt)) {
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                }
+            }
+            return fmt;
+        };
+        var $reconnect_text_box = $('#reconnect_text');
+        var $message_monitor = $('#message-monitor tbody');
+
+        function changeStatus(status) {
+            if (status === RunnerStatus.DEFAULT) {
+
+            }
+            else if (status === RunnerStatus.RUNNING) {
+
+            }
+            else if (status === RunnerStatus.SUCCESS) {
+
+            }
+            else if (status === RunnerStatus.ERROR) {
+
+            }
+            else if (status === RunnerStatus.OPENED) {
+
+                $reconnect_text_box.attr("hidden", "hidden");
+            }
+            else if (status === RunnerStatus.CLOSED) {
+
+                $reconnect_text_box.removeAttr("hidden");
+            }
+        }
+        socket = new ReconnectingWebSocket("ws://" + window.location.host + "/monitor/{{ object.uuid }}/");
+        socket.onclose = function () {
+            changeStatus(RunnerStatus.CLOSED);
+        };
+        socket.onopen = function () {
+            changeStatus(RunnerStatus.OPENED);
+        };
+        socket.onmessage = function (e) {
+            try {
+                var obj = $.parseJSON(e.data);
+                if (obj.message_type === "message") {
+                    var date = new Date();
+                    var formatter = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>";
+                    var currentMessage = String.format(formatter, date.pattern("yyyy-MM-dd hh:mm:ss"), obj.message.id, obj.message.length, obj.message.bus_type, obj.message.origin);
+                    $message_monitor.prepend(currentMessage);
+                }
+            }
+            catch (error) {
+                alert(error);
+                alert(e.data);
+            }
+            finally {
+            }
+        };
+
+    </script>
+    <script>
+        $(function () {
+            $("#tree").fancytree(
+                {
+                    selectMode: 3,
+                    checkbox: true,
+                    source: JSON.parse($("#simple_icd_tree").text()),
+                    select: function (event, data) {
+                        var rules = $.map(data.tree.getSelectedNodes(), function (node) {
+                            if (node.data.type === "message") {
+                                return node.data.id;
+                            }
+                        });
+                        var postData = {
+                            "csrfmiddlewaretoken": Cookies.get('csrftoken'),
+                            "rules": rules.join("-")
+                        };
+                        $.post("{% url "ate_tasks:monitor-set-rule" object.id %}", postData, function (data, status) {
+                            if (status === 'success') {
+                                if (data.result === 'success') {
+                                    $.confirm({
+                                        backgroundDismiss: true,
+                                        content: "设置规则成功",
+                                        title: "提示",
+                                        buttons: {
+                                            ok: {
+                                                text: "确认"
+                                            }
+                                        }
+                                    });
+                                }
+                                else {
+                                    $.confirm({
+                                        backgroundDismiss: true,
+                                        content: "设置规则失败",
+                                        title: "提示",
+                                        buttons: {
+                                            ok: {
+                                                text: "确认"
+                                            }
+                                        }
+                                    });
+                                }
+
+                            } else {
+                                $.confirm({
+                                    backgroundDismiss: true,
+                                    content: "设置规则时发生错误",
+                                    title: "提示",
+                                    buttons: {
+                                        ok: {
+                                            text: "确认"
+                                        }
+                                    }
+                                });
+                            }
+
+                        });
+                    }
+                }
+            );
+        });
+    </script>
+{% endblock %}
+
+{% block icd_navigator %}
+    <div id="simple_icd_tree" hidden="hidden">
+        {{ simple_icd_tree }}
+    </div>
+    <div id="tree"></div>
+{% endblock %}

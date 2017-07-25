@@ -1,0 +1,79 @@
+{% extends "ate_tasks/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block head_img %}
+    <img src="{% static 'ate_tasks/img/module_design.jpg' %}" width="100%"/>
+{% endblock %}
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {% breadcrumb "自动测试平台" "ate_tasks:index" %}
+{% endblock %}
+{% block main_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/alpaca.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ate_tasks/css/bootstrap-multiselect.css' %}" rel="stylesheet">
+    <link href="{% static 'ate_tasks/css/jquery-confirm.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/jquery.formset.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/bootstrap-multiselect.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/handlebars-v4.0.10.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/alpaca.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/js.cookie.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/jquery-confirm.min.js' %}"></script>
+{% endblock %}
+{% block work_space %}
+    <div id="wrap-work-space" class="">
+        <div class="container">
+            <div class="row">
+                <div id="form"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_script %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#form").alpaca({
+                "view": "bootstrap-edit",
+                "dataSource": "/data/get_device_binding/?pk=15",
+                "schemaSource": "/data/get_binding_schema/?bus_type=RS422",
+                "optionsSource": "/data/get_binding_option/?bus_type=RS422",
+                "options": {
+                    "form": {
+                        "attributes": {
+                            "action": "",
+                            "method": "post",
+                            "enctype": "multipart/form-data"
+                        },
+                        "buttons": {
+                            "submit": {
+                                "title": "更新",
+                                "click": function () {
+                                    var value = this.getValue();
+                                    var postData = {
+                                        "csrfmiddlewaretoken": Cookies.get('csrftoken'),
+                                        "bindings": JSON.stringify(value, null, "  ")
+                                    };
+                                    $.post("", postData, function (result) {
+                                        var control = $("#form").alpaca("get");
+                                        control.refresh(function () {
+                                            $.alert({
+                                                title: '更新成功',
+                                                content: '内容已更新'
+                                            });
+                                        });
+                                    });
+
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

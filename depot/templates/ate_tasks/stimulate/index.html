@@ -1,0 +1,125 @@
+{% extends "ate_tasks/stimulate/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "静态激励" "ate_tasks:stimulate-index" %}
+{% endblock %}
+{% block main_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/alpaca.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ate_tasks/css/bootstrap-multiselect.css' %}" rel="stylesheet">
+    <link href="{% static 'ate_tasks/css/jquery-confirm.min.css' %}" rel="stylesheet">
+    <style>
+        .my-handle {
+            cursor: move;
+            cursor: -webkit-grabbing;
+        }
+
+        #simpleList li {
+            position: relative;
+        }
+
+        #simpleList i {
+            -webkit-transition: opacity .2s;
+            transition: opacity .2s;
+            opacity: 0;
+            display: block;
+            cursor: pointer;
+            color: #c00;
+            top: 10px;
+            right: 40px;
+            position: absolute;
+            font-style: normal;
+        }
+
+        #simpleList li:hover i {
+            opacity: 1;
+        }
+    </style>
+    <link href="{% static 'ate_tasks/css/skin-win8/ui.fancytree.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/bootstrap-multiselect.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/handlebars-v4.0.10.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/alpaca.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/js.cookie.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/jquery-confirm.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/Sortable.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/jquery.fancytree-all-deps.min.js' %}"></script>
+{% endblock %}
+{% block stmulate_work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="simple_icd_tree" hidden="hidden">
+                    {{ simple_icd_tree }}
+                </div>
+                <div id="icd_tree"></div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div id="form"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <ul id="simpleList" class="list-group">
+                    <li data-id="1" class="list-group-item"><span class="my-handle">::</span>保活报文1<i
+                            class="js-remove">✖</i>
+                    </li>
+                    <li data-id="1" class="list-group-item"><span class="my-handle">::</span>保活报文2<i
+                            class="js-remove">✖</i>
+                    </li>
+                    <li data-id="1" class="list-group-item"><span class="my-handle">::</span>保活报文3<i
+                            class="js-remove">✖</i>
+                    </li>
+                    <li data-id="2" class="list-group-item"><span class="my-handle">::</span>保活报文4<i
+                            class="js-remove">✖</i>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block extra_script %}
+    {{ block.super }}
+    <script>
+        var editableList = Sortable.create(simpleList, {
+            handle: '.my-handle',
+            animation: 150,
+            filter: ".js-remove, .js-edit",
+            onFilter: function (evt) {
+                var item = evt.item,
+                    ctrl = evt.target;
+
+                if (Sortable.utils.is(ctrl, ".js-remove")) {  // Click on remove button
+                    item.parentNode.removeChild(item); // remove sortable item
+                }
+                else if (Sortable.utils.is(ctrl, ".js-edit")) {  // Click on edit link
+                    // ...
+                }
+            }
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#icd_tree").fancytree(
+                {
+                    source: JSON.parse($("#simple_icd_tree").text())
+                }
+            );
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#form").alpaca({
+                "view": "bootstrap-edit",
+                "dataSource": "{% url 'ate_tasks:get-random-message-init-data' %}",
+                "schemaSource": "{% url 'ate_tasks:get-message-schema' %}?bus_type=Test",
+                "optionsSource": "{% url 'ate_tasks:get-message-option' %}?bus_type=Test"
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "ate_tasks/entity/base_list.html" %}
+
+{% block design_work_space %}
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h2 class="" contenteditable="false">{{ title }}</h2>
+            </div>
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% block model_form %}
+                    <table class="table table-bordered">
+                        {{ form.as_table }}
+                    </table>
+                {% endblock %}
+                {% block inline_formset %}{% endblock %}
+                {% block submit_button %}{% endblock %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

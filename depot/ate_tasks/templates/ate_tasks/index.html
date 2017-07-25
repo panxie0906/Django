@@ -1,0 +1,37 @@
+{% extends "ate_tasks/base_site.html" %}
+{% block work_space %}
+    <div class="page-header">
+        <h1 contenteditable="false">快速导航</h1>
+    </div>
+    <ul>
+        <li>
+            <p class="lead">测试开发：<a href="{% url 'ate_tasks:entity-validation-phase-list' %}">验证阶段管理</a>，
+                <a href="{% url 'ate_tasks:entity-project-list' %}">项目管理</a>，
+                <a href="{% url 'ate_tasks:entity-product-list' %}">产品管理</a>，
+                <a href="{% url 'ate_tasks:entity-product-instance-list' %}">产品实例管理</a>，
+                <a href="{% url 'ate_tasks:entity-keyword-list' %}">关键字管理</a>，
+                <a href="{% url 'ate_tasks:entity-test-item-list' %}">测试项管理</a>，
+                <a href="{% url 'ate_tasks:entity-task-list' %}">测试任务管理</a>,
+                <a href="{% url 'ate_tasks:entity-task-instance-list' %}">测试任务实例管理</a>
+            </p>
+        </li>
+        <li>
+            <p class="lead">测试执行：<a href="{% url 'ate_tasks:execute-runner-list' %}">任务实例列表</a>
+            </p>
+        </li>
+        <li>
+            <p class="lead">激励与监控：<a href="{% url "ate_tasks:icd-project-list" %}">ICD</a>,
+                <a href="{% url "ate_tasks:device-list" %}">资源管理</a>,
+                <a href="{% url "ate_tasks:monitor-new" %}">数据监控</a>
+            </p>
+        </li>
+        <li>
+            <p class="lead">数据中心：<a target="_blank" href="{% url "ate_tasks:api-root" %}">数据接口</a>
+            </p>
+        </li>
+        <li>
+            <p class="lead">个人中心：<a href="{% url "admin:index" %}" target="_blank">用户后台</a>
+            </p>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "ate_tasks/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block head_img %}
+    <img src="{% static 'ate_tasks/img/module_design.jpg' %}" width="100%"/>
+{% endblock %}
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {% breadcrumb "自动测试平台" "ate_tasks:index" %}
+{% endblock %}
+
+{% block work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                {% render_breadcrumbs %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                {% block icd_navigator %}
+
+                {% endblock %}
+            </div>
+            <div class="col-md-9">
+                {% block monitor_work_space %}
+                    <div id="reconnect_text" class="col-md-12" hidden="hidden"><span> 网络通信中断...正在重新连接...</span>
+                    </div>
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#1" data-toggle="tab">消息监控</a>
+                        </li>
+                        <li><a href="#2" data-toggle="tab">变量监控</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content ">
+                        <div class="tab-pane active" id="1">
+                            {% block message_monitor_workspace %}{% endblock %}</div>
+                        <div class="tab-pane" id="2">
+                            {% block variable_monitor_workspace %}{% endblock %}</div>
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

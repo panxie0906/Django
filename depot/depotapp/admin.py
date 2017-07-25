@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from . import models
+from .models import depot
 
 class BaseAdmin(admin.ModelAdmin):
 	list_displa=('name','price')#指定要显示的字段
@@ -16,4 +16,4 @@ class BaseAdmin(admin.ModelAdmin):
 	()，
 	)
 	'''
-admin.site.register(models.Product,BaseAdmin)
+admin.site.register(depot.Product,BaseAdmin)

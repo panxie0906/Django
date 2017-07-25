@@ -1,0 +1,42 @@
+{% extends "ate_tasks/entity/base_list.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "ICD" "ate_tasks:icd-project-list" %}
+{% endblock %}
+{% block list_table_content %}
+    <thead>
+    <tr>
+        <th style="text-align: center;">项目名称</th>
+        <th style="text-align: center;">ID</th>
+        <th style="text-align: center;">版本</th>
+        <th style="text-align: center;">
+            <a href="{% url "ate_tasks:icd-upload" %}"
+               class="btn btn-success"
+               role="button">上传文件 <span
+                    class="glyphicon glyphicon-apple"></span>
+            </a>
+        </th>
+    </thead>
+    <tbody>
+    {% for current_obj in page_obj.object_list %}
+        <tr>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.name }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.project_id }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.version }}</td>
+            <td style='vertical-align: middle;text-align: center;'>
+                <a href="{% url "ate_tasks:icd-project-detail" current_obj.id %}"
+                   class="btn btn-default"
+                   role="button">进入 <span class="glyphicon glyphicon-edit"></span>
+                </a>
+                <a href="{% url "ate_tasks:icd-project-delete" current_obj.id %}"
+                   class="btn btn-danger"
+                   role="button">删除 <span class="glyphicon glyphicon-edit"></span>
+                </a>
+            </td>
+
+        </tr>
+    {% endfor %}
+
+    </tbody>
+{% endblock %}

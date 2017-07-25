@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    {% block title %}{% endblock %}
+    {% block main_style %}{% endblock %}
+    {% block main_script %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+    {% block authenticated %}
+        {% block navigator %}{% endblock %}
+        {% block container %}{% endblock %}
+        {% block copy_right %}{% endblock copy_right %}
+        {% block extra_script %}{% endblock %}
+    {% endblock %}
+{% else %}
+    {% block not_authenticated %}{% endblock %}
+{% endif %}
+</body>
+
+</html>

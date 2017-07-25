@@ -1,0 +1,83 @@
+{% extends "ate_tasks/icd/icd_project_list.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb object.name "ate_tasks:icd-project-detail" object.id %}
+{% endblock %}
+{% block main_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/skin-win8/ui.fancytree.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/jquery.fancytree-all-deps.min.js' %}"></script>
+{% endblock %}
+{% block work_space %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                {% render_breadcrumbs %}
+            </div>
+            <div class="col-md-3">
+                <div id="tree"></div>
+            </div>
+            <div class="col-md-9">
+                <div id="attrs-container" class="row">
+                    <div id="attrs-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_script %}
+    {{ block.super }}
+    <div id="icd_project_tree" hidden="hidden">
+        {{ icd_project_tree }}
+    </div>
+    <script>
+        $(function () {
+            $("#tree").fancytree(
+                {
+                    click: function (event, data) {
+                        if (data.node.data.type !== 'bus') {
+                            var $attrs_table = $('#attrs-table');
+                            var query_dict = {
+                                'id': data.node.data.id,
+                                'type': data.node.data.type
+                            };
+                            $.get("{% url "ate_tasks:query-icd-node-attrs"%}", query_dict, function (responseData, status) {
+                                if (status === 'success') {
+                                    $attrs_table.html(responseData);
+                                } else {
+                                    $.confirm({
+                                        title: '无法获取属性',
+                                        content: responseData,
+                                        type: 'red',
+                                        buttons: {
+                                            "确认": function () {
+
+                                            }
+                                        }
+                                    });
+                                }
+                            }).fail(function (jqXHR, textStatus, errorThrown) {
+                                $.confirm({
+                                    title: '无法获取属性',
+                                    content: '网络连接失败',
+                                    type: 'red',
+                                    buttons: {
+                                        "确认": function () {
+
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    source: JSON.parse($("#icd_project_tree").text())
+                }
+            );
+        });
+    </script>
+{% endblock %}

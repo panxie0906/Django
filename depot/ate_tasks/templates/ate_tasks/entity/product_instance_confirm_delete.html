@@ -1,0 +1,12 @@
+{% extends "ate_tasks/entity/base_delete.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb verbose_name "ate_tasks:entity-product-instance-list" %}
+    {% breadcrumb "删除" "ate_tasks:entity-product-instance-delete" object.id %}
+{% endblock %}
+{% block submit_button %}
+    {{ block.super }}
+    <a href="{% url "ate_tasks:entity-product-instance-list" %}" class="btn btn-default" role="button">返回</a>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "ate_tasks/base_site.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block head_img %}
+    <img src="{% static 'ate_tasks/img/module_design.jpg' %}" width="100%"/>
+{% endblock %}
+
+
+{% block work_space %}
+    <div id="wrap-work-space" class="">
+        <div class="container">
+            <div class="row">
+                <div>
+                    {{ data }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

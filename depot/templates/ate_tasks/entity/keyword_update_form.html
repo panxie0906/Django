@@ -1,0 +1,35 @@
+{% extends "ate_tasks/entity/base_update.html" %}
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb verbose_name "ate_tasks:entity-keyword-list" %}
+    {% breadcrumb "更新" "ate_tasks:entity-keyword-update" object.id %}
+{% endblock %}
+{% block main_style %}
+    {{ block.super }}
+    <link href="{% static 'ate_tasks/css/codemirror.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    {{ block.super }}
+    <script src="{% static 'ate_tasks/js/codemirror.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/python.js' %}"></script>
+
+{% endblock %}
+{% block extra_script %}
+    {{ block.super }}
+    <script>
+        document.getElementById('id_example_code').removeAttribute("required");
+        var editor = CodeMirror.fromTextArea(document.getElementById("id_example_code"), {
+            mode: {
+                name: "python",
+                version: 3,
+                singleLineStringErrors: false
+            },
+            lineNumbers: true,
+            indentUnit: 4,
+            matchBrackets: true
+        });
+
+    </script>
+{% endblock %}

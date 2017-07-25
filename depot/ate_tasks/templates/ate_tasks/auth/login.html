@@ -1,0 +1,55 @@
+{% extends "ate_tasks/base.html" %}
+{% load static %}
+{% block main_style %}
+    <link href="{% static 'ate_tasks/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ate_tasks/css/jquery-confirm.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block main_script %}
+    <script src="{% static 'ate_tasks/js/jquery-3.1.1.min.js' %}"></script>
+    <script>
+        try {
+            $ = jQuery = module.exports;
+        } catch (e) {
+        }
+    </script>
+    <script src="{% static 'ate_tasks/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'ate_tasks/js/jquery-confirm.min.js' %}"></script>
+{% endblock %}
+{% block not_authenticated %}
+    {% if messages %}
+        <div hidden="hidden" id="confirm-messages">
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <script>
+            $.confirm({
+                backgroundDismiss: true,
+                content: $("#confirm-messages").html(),
+                title: "提示",
+                buttons: {
+                    ok: {
+                        text: "确认"
+                    }
+                }
+            });
+        </script>
+    {% endif %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <header class="page-header text-center">
+                    <h1>用户登录</h1>
+                </header>
+                <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <table class="table table-bordered">
+                        {{ form.as_table }}
+                    </table>
+                    <input type="submit" class="btn btn-success pull-right" value="登录">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

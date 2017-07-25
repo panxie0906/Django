@@ -1,0 +1,33 @@
+{% extends "ate_tasks/entity/base_list.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "任务实例列表" "ate_tasks:execute-runner-list" %}
+{% endblock %}
+{% block list_table_content %}
+    <thead>
+    <tr>
+        <th style="text-align: center;">所属产品实例</th>
+        <th style="text-align: center;">所属任务</th>
+        <th style="text-align: center;">创建日期</th>
+        <th style="text-align: center;">修改日期</th>
+        <th style="text-align: center;">创建者</th>
+        <th style="text-align: center;"></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for current_obj in page_obj.object_list %}
+        <tr>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.product_instance }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.task }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.created }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.modified }}</td>
+            <td style='vertical-align: middle;text-align: center;'>{{ current_obj.creator }}</td>
+            <td style='vertical-align: middle;text-align: center;'>
+                <a href="{% url 'ate_tasks:execute-runner' current_obj.id %}" class="btn btn-info" role="button">进入实例
+                    <span class="glyphicon glyphicon-edit"></span>
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}

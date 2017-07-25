@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 	
 	url(r'^depotapp/',include('depotapp.urls')),
+	url(r'^ate/',include('ate_tasks.urls'))
 ]
